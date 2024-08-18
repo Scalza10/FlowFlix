@@ -1,5 +1,5 @@
 import os
-from models import Codes, db
+from models import Code, db
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 import urllib.parse
 
@@ -33,7 +33,7 @@ db.init_app(app)
 @app.route('/')
 def home():
     if 'username' in session:
-        first_code = Codes.query.first()
+        first_code = Code.query.first()
         return f"Welcome, {session['username']}! <br> This is your code {first_code.Code} <br><a href='/logout'>Logout</a>"
     return redirect(url_for('login'))
 

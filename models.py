@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-class Codes(db.Model):
+class Code(db.Model):
     __tablename__ = 'Codes'
 
     Id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -18,3 +18,21 @@ class Codes(db.Model):
 
     def __repr__(self):
         return f'<Code {self.Code}>'
+
+class User(db.Model):
+    __tablename__ = 'Users'
+
+    Id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    Username = db.Column(db.String(50), unique=True, nullable=False)
+    Email = db.Column(db.String(100), unique=True, nullable=False)
+    PasswordHash = db.Column(db.String(255), nullable=False)
+    CreatedAt = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    UpdatedAt = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    def __init__(self, username, email, password_hash):
+        self.Username = username
+        self.Email = email
+        self.PasswordHash = password_hash
+
+    def __repr__(self):
+        return f'<User {self.Username}>'
