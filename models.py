@@ -8,7 +8,7 @@ class Code(db.Model):
 
     Id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Code = db.Column(db.String(50), nullable=False)
-    StartDate = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    StartDate = db.Column(db.DateTime, nullable=False, default=datetime.now)
     ExpirationDate = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, code, start_date, expiration_date):
@@ -26,8 +26,8 @@ class User(db.Model):
     Username = db.Column(db.String(50), unique=True, nullable=False)
     Email = db.Column(db.String(100), unique=True, nullable=False)
     PasswordHash = db.Column(db.String(255), nullable=False)
-    CreatedAt = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    UpdatedAt = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    CreatedAt = db.Column(db.DateTime, default=datetime.now, nullable=False)
+    UpdatedAt = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
 
     def __init__(self, username, email, password_hash):
         self.Username = username
