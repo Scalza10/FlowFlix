@@ -1,4 +1,7 @@
+import os
+from models import Codes, db
 from flask import Flask, render_template, redirect, url_for, request, flash, session
+import urllib.parse
 
 app = Flask(__name__)
 app.secret_key = 'potato123422'  # Necessary for session management
@@ -9,10 +12,29 @@ users = {'user1': 'password123',
          'user3': 'password789'
     }
 
+
+driver="ODBC Driver 17 for SQL Server"
+
+# Construct connection string
+odbc_connect_str = (
+    f"DRIVER={{{driver}}};"
+    f"SERVER={os.getenv('DB_SERVER')};"
+    f"PORT=1433;"
+    f"DATABASE={os.getenv('DB_DATABASE')};"
+    f"UID={os.getenv('DB_USERNAME')};"
+    f"PWD={os.getenv('DB_PASSWORD')};"
+)
+
+conn_params = urllib.parse.quote_plus(odbc_connect_str)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f"mssql+pyodbc:///?odbc_connect={conn_params}"
+db.init_app(app)
+
 @app.route('/')
 def home():
     if 'username' in session:
-        return f"Welcome, {session['username']}! <br><a href='/logout'>Logout</a>"
+        first_code = Codes.query.first()
+        return f"Welcome, {session['username']}! <br> This is your code {first_code.Code} <br><a href='/logout'>Logout</a>"
     return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
