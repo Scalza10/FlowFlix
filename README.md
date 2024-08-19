@@ -18,5 +18,4 @@ This is a sample Flask application that integrates with an SQL database and incl
 - Python 3.x
 - Flask
 - SQLAlchemy
-- SQLite (or any other preferred SQL database)
-
+- SQL Server (but any other SQL Database can be used)
