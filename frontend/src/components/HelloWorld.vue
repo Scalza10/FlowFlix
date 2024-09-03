@@ -32,10 +32,25 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: 'HelloWorld',
   props: {
     msg: String
+  },
+  methods: {
+    sayHello() {
+      axios.get('http://localhost:5000/api/msg')
+        .then(response => {
+          console.log(response.data)
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    }
+  },
+  mounted() {
+    this.sayHello()
   }
 }
 </script>
