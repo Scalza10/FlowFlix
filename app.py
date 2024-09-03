@@ -1,9 +1,11 @@
 import os
 from models import Code, db
 from flask import Flask, render_template, redirect, url_for, request, flash, session
+from flask_cors import CORS
 import urllib.parse
 
 app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 app.secret_key = 'potato123422'  # Necessary for session management
 
 # Dummy user data
@@ -55,6 +57,10 @@ def logout():
     session.pop('username', None)
     flash('You have been logged out.', 'info')
     return redirect(url_for('login'))
+
+@app.route('/api/msg', methods=['GET'])
+def msg():
+    return "Hello World!"
 
 if __name__ == '__main__':
     app.run(debug=True)
