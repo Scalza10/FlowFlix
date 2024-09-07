@@ -1,6 +1,6 @@
 import os
-from models import Code, db
-from flask import Flask, render_template, redirect, url_for, request, flash, session, send_from_directory
+from models import db, Code, User 
+from flask import Flask, render_template, redirect, url_for, request, flash, session, send_from_directory, jsonify
 from flask_cors import CORS
 import urllib.parse
 
@@ -64,6 +64,25 @@ db.init_app(app)
 @app.route('/api/msg', methods=['GET'])
 def msg():
     return "Hello World!"
+
+@app.route('/api/register', methods=['POST'])
+def register():
+    username = request.json['username']
+    email = request.json['email']
+    password = request.json['password']
+    
+    # Check if user already exists
+    user = User.query.filter_by(Username=username).first()
+    if user:
+        return jsonify({"message": "User already exists!"}), 400
+    
+    # Create new user
+    new_user = User(username, email, password)
+    db.session.add(new_user)
+    db.session.commit()    
+    
+    return jsonify({"message": "Registration successful!"}), 200
+
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
