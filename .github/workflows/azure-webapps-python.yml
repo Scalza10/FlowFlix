@@ -60,7 +60,7 @@ jobs:
       - name: Install Node.js dependencies
         run: |
           cd frontend
-          npm Install
+          npm install
       
       - name: Build Vuejs project
         run: |
