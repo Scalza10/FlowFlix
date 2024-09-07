@@ -64,7 +64,10 @@ jobs:
 
       - name: Create deployment archive
         run: |
-          tar -czf deployment-package.tar.gz --exclude='venv' .
+          mkdir temp-deployment
+          cp -r * temp-deployment
+          tar -czf deployment-package.tar.gz --exclude='venv' -C temp-deployment .
+
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v3
