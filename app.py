@@ -1,6 +1,8 @@
 import os
 from models import db, Code, User 
 from flask import Flask, render_template, redirect, url_for, request, flash, session, send_from_directory, jsonify
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 import urllib.parse
 
@@ -9,14 +11,11 @@ app = Flask(__name__,
             template_folder = "./frontend/dist")
 
 CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 app.secret_key = 'potato123422'  # Necessary for session management
+app.config['JWT_SECRET_KEY'] = 'potato123422'  # Necessary for session management
 
-# Dummy user data
-users = {'user1': 'password123',
-         'user2': 'password456',
-         'user3': 'password789'
-    }
-
+jwt = JWTManager(app)
 
 driver="ODBC Driver 17 for SQL Server"
 
@@ -34,32 +33,6 @@ conn_params = urllib.parse.quote_plus(odbc_connect_str)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f"mssql+pyodbc:///?odbc_connect={conn_params}"
 db.init_app(app)
-
-# @app.route('/')
-# def home():
-#     if 'username' in session:
-#         first_code = Code.query.first()
-#         return f"Welcome, {session['username']}! <br> This is your code {first_code.Code} <br><a href='/logout'>Logout</a>"
-#     return redirect(url_for('login'))
-
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     if request.method == 'POST':
-#         username = request.form['username']
-#         password = request.form['password']
-#         if username in users and users[username] == password:
-#             session['username'] = username
-#             flash('Login successful!', 'success')
-#             return redirect(url_for('home'))
-#         else:
-#             flash('Invalid credentials. Please try again.', 'danger')
-#     return render_template('login.html')
-
-# @app.route('/logout')
-# def logout():
-#     session.pop('username', None)
-#     flash('You have been logged out.', 'info')
-#     return redirect(url_for('login'))
 
 @app.route('/api/msg', methods=['GET'])
 def msg():
@@ -82,6 +55,31 @@ def register():
     db.session.commit()    
     
     return jsonify({"message": "Registration successful!"}), 200
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    username = request.json['username']
+    password = request.json['password']
+    
+    # Check if user exists
+    user = User.query.filter_by(Username=username).first()
+    if user is None:
+        return jsonify({"message": "User does not exist!"}), 400
+    
+    # Check if password is correct
+    if not check_password_hash(user.PasswordHash, password):
+        return jsonify({"message": "Invalid password!"}), 400
+    
+    # Create JWT token
+    access_token = create_access_token(identity={'username': user.Username, 'email': user.Email})
+    return jsonify({"message": "Login successful!", "access_token": access_token}), 200
+
+
+@app.route('/api/protected', methods=['GET'])
+@jwt_required()
+def protected():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
 
 
 @app.route('/', defaults={'path': ''})

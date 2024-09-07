@@ -40,7 +40,7 @@ export default {
   },
   methods: {
     sayHello() {
-      axios.get('http://localhost:5000/api/msg')
+      axios.get('/api/msg')
         .then(response => {
           console.log(response.data)
         })

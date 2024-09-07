@@ -1,29 +1,113 @@
 <template>
-    <div>
-        <h1>Login</h1>
-            <label for="username">Username:</label><br>
-            <input type="text" id="username" name="username" v-model="username"><br>
-            <label for="password">Password:</label><br>
-            <input type="password" id="password" name="password" v-model="password"><br><br>
-            <button @click="login">Login</button>
+    <div class="login">
+      <h1>Login</h1>
+      <form @submit.prevent="login">
+        <div>
+          <label for="username">Username:</label>
+          <input type="text" id="username" v-model="username" required>
+        </div>
+        <div>
+          <label for="password">Password:</label>
+          <input type="password" id="password" v-model="password" required>
+        </div>
+        <button type="submit">Login</button>
+      </form>
+      <p v-if="message">{{ message }}</p>
+      <router-link to="/register">
+        <button>Go to Register</button>
+      </router-link>
     </div>
-</template>
-
-<script>
-
-export default {
+  </template>
+  
+  <script>
+  import axios from 'axios';
+  
+  export default {
     name: 'LoginView',
     data() {
-        return {
-            username: '',
-            password: ''
-        }
+      return {
+        username: '',
+        password: '',
+        message: ''
+      };
     },
     methods: {
-        login() {
-            console.log('login')
+      async login() {
+        try {
+          const response = await axios.post('/api/login', {
+            username: this.username,
+            password: this.password
+          });
+  
+          this.message = response.data.message;
+          localStorage.setItem('access_token', response.data.access_token);
+          
+          // Redirect to dashboard
+          this.$router.push('/dashboard');
+        } catch (error) {
+          this.message = error.response.data.message;
         }
+      }
     }
-}
-
-</script>
+  };
+  </script>
+  
+  <style scoped>
+  .login {
+    padding: 20px;
+  }
+  
+  .login h1 {
+    color: #2c3e50;
+  }
+  
+  .login form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .login form div {
+    margin-bottom: 10px;
+  }
+  
+  .login form label {
+    margin-right: 10px;
+  }
+  
+  .login form input {
+    padding: 5px;
+    font-size: 16px;
+  }
+  
+  .login form button {
+    padding: 10px;
+    font-size: 16px;
+    background-color: #42b983;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .login form button:hover {
+    background-color: #369f6b;
+  }
+  
+  .login p {
+    margin-top: 20px;
+    color: #42b983;
+  }
+  
+  .router-link button {
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #42b983;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .router-link button:hover {
+    background-color: #369f6b;
+  }
+  </style>

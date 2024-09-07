@@ -1,13 +1,33 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <router-link to="/register">Register</router-link> |
-    <router-link to="/login">Login</router-link> |
-    <router-link to="/dashboard">Dashboard</router-link>
-  </nav>
-  <router-view/>
+  <div id="app">
+    <nav>
+      <router-link to="/">Home</router-link> |
+      <router-link to="/about">About</router-link> |
+      <router-link to="/dashboard">Dashboard</router-link>
+    </nav>
+    <router-view :username="username"/>
+  </div>
 </template>
+
+<script>
+import jwt_decode from 'jwt-decode';
+
+export default {
+  name: 'App',
+  data() {
+    return {
+      username: ''
+    };
+  },
+  created() {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      const decoded = jwt_decode(token);
+      this.username = decoded.username;
+    }
+  }
+};
+</script>
 
 <style>
 #app {
