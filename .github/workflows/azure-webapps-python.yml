@@ -62,18 +62,13 @@ jobs:
           cd frontend
           npm install
 
-      - name: Create deployment archive
-        run: |
-          mkdir temp-deployment
-          cp -r * temp-deployment
-          tar -czf deployment-package.tar.gz --exclude='venv' -C temp-deployment .
-
-
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v3
         with:
           name: python-app
-          path: deployment-package.tar.gz
+          path: |
+            .
+            !venv/
 
   deploy:
     permissions:
@@ -90,10 +85,6 @@ jobs:
         with:
           name: python-app
           path: .
-
-      - name: Extract deployment package
-        run: |
-          tar -xzf deployment-package.tar.gz
 
       - name: 'Login to Azure'
         uses: azure/login@v1
