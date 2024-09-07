@@ -61,13 +61,17 @@ jobs:
         run: |
           cd frontend
           npm install
+          npm build
+      
+      - name: Zip artifact for deployment
+        run: zip release.zip ./* -r
 
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v3
         with:
           name: python-app
           path: |
-            .
+            release.zip
             !venv/
 
   deploy:
@@ -85,6 +89,9 @@ jobs:
         with:
           name: python-app
           path: .
+
+      - name: unzip artifact for deployment
+        run: unzip release.zip
 
       - name: 'Login to Azure'
         uses: azure/login@v1
