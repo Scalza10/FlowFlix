@@ -60,8 +60,12 @@ jobs:
       - name: Install Node.js dependencies
         run: |
           cd frontend
-          npm install
-          npm build
+          npm Install
+      
+      - name: Build Vuejs project
+        run: |
+          cd frontend
+          npm run build
       
       - name: Zip artifact for deployment
         run: zip release.zip ./* -r
