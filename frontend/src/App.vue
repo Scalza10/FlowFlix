@@ -1,9 +1,11 @@
 <template>
   <div id="app">
     <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link> |
-      <router-link to="/dashboard">Dashboard</router-link>
+      <div class="nav-container">
+        <router-link to="/" class="nav-link" active-class="active-link">Home</router-link>
+        <router-link to="/about" class="nav-link" active-class="active-link">About</router-link>
+        <router-link to="/dashboard" class="nav-link" active-class="active-link">Dashboard</router-link>
+      </div>
     </nav>
     <router-view :username="username"/>
   </div>
@@ -30,18 +32,39 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  background: linear-gradient(to right, #4e4eff, #920092); /* Background gradient */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 nav {
-  padding: 30px;
+  padding: 20px;
 }
 
-nav a {
-  font-weight: bold;
+.nav-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.nav-link {
+  padding: 10px 20px;
+  border-radius: 20px;
+  background-color: #ffffff;
   color: #2c3e50;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
 }
 
-nav a.router-link-exact-active {
-  color: #42b983;
+.nav-link:hover {
+  background-color: #42b983;
+  color: white;
+}
+
+.active-link {
+  background-color: #42b983;
+  color: white;
 }
 </style>

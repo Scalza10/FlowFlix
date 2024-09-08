@@ -1,21 +1,26 @@
 <template>
-  <div class="login">
-    <h1>Login</h1>
-    <form @submit.prevent="handleLogin">
-      <div>
-        <label for="username">Username:</label>
-        <input type="text" id="username" v-model="username" required />
-      </div>
-      <div>
-        <label for="password">Password:</label>
-        <input type="password" id="password" v-model="password" required />
-      </div>
-      <button type="submit">Login</button>
-    </form>
-    <p v-if="message">{{ message }}</p>
-    <router-link to="/register">
-      <button>Go to Register</button>
-    </router-link>
+  <div class="login-container">
+    <div class="login-card">
+      <h1>Login</h1>
+      <form @submit.prevent="handleLogin">
+        <div class="input-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" v-model="username" required />
+        </div>
+        <div class="input-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" v-model="password" required />
+        </div>
+        <div class="actions">
+          <button type="submit" class="login-button">Login</button>
+          <router-link to="/register">
+            <button type="button" class="register-button">Register</button>
+          </router-link>
+        </div>
+      </form>
+      <p v-if="message" class="message">{{ message }}</p>
+      <p class="forgot-password">Forgot your password?</p>
+    </div>
   </div>
 </template>
 
@@ -43,88 +48,93 @@ export default {
         });
 
         if (response && response.data) {
-          this.message = response.data.message || "Login successful!";
-          if (response.data.access_token) {
-            // Use the Vuex 'login' action mapped earlier
-            await this.login(response.data.access_token);
-            this.$router.push("/dashboard");
-          } else {
-            throw new Error("Access token not found");
-          }
-        } else {
-          this.message = "Invalid response from the server.";
+          this.message = response.data.message;
+          this.$store.dispatch('login', response.data.access_token);
+          this.$router.push('/dashboard');
         }
       } catch (error) {
-        console.log(error);
-        if (error.response && error.response.data) {
-          this.message = error.response.data.message || "Login failed.";
-        } else if (error.message) {
-          this.message = error.message;
+        if (error.response) {
+          this.message = error.response.data.message;
         } else {
-          this.message = "An error occurred. Please try again.";
+          this.message = 'An error occurred. Please try again.';
         }
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style scoped>
-.login {
-  padding: 20px;
-}
-
-.login h1 {
-  color: #2c3e50;
-}
-
-.login form {
+.login-container {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(to right, #4e4eff, #920092);
 }
 
-.login form div {
-  margin-bottom: 10px;
+.login-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 300px;
 }
 
-.login form label {
-  margin-right: 10px;
+h1 {
+  margin-bottom: 20px;
+  color: #333;
 }
 
-.login form input {
-  padding: 5px;
-  font-size: 16px;
+.input-group {
+  margin-bottom: 15px;
+  text-align: left;
 }
 
-.login form button {
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.input-group input {
+  width: 75%; /* Set the width to 75% of the login-card */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin: 0 auto; /* Center the input */
+  display: block; /* Center the input */
+}
+
+.actions {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 20px;
+}
+
+.login-button, .register-button {
   padding: 10px;
-  font-size: 16px;
   background-color: #42b983;
   color: white;
   border: none;
+  border-radius: 5px;
   cursor: pointer;
+  width: 100px;
 }
 
-.login form button:hover {
+.login-button:hover, .register-button:hover {
   background-color: #369f6b;
 }
 
-.login p {
+.message {
   margin-top: 20px;
   color: #42b983;
 }
 
-.router-link button {
+.forgot-password {
   margin-top: 10px;
-  padding: 10px;
-  font-size: 16px;
-  background-color: #42b983;
-  color: white;
-  border: none;
+  color: #333;
   cursor: pointer;
-}
-
-.router-link button:hover {
-  background-color: #369f6b;
 }
 </style>

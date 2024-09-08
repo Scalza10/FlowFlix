@@ -54,7 +54,9 @@ def register():
     db.session.add(new_user)
     db.session.commit()    
     
-    return jsonify({"message": "Registration successful!"}), 200
+    # Create JWT token
+    access_token = create_access_token(identity={'username': new_user.Username, 'email': new_user.Email})
+    return jsonify({"message": "Registration successful! Redirecting shortly...", "access_token": access_token}), 200
 
 @app.route('/api/login', methods=['POST'])
 def login():
