@@ -20,7 +20,7 @@
         </div>
         <div class="dashboard-section">
           <h2>Quick Actions</h2>
-          <button class="action-button">Action 1</button>
+          <button @click="sendEmail" class="action-button">Action 1</button>
           <button class="action-button">Action 2</button>
         </div>
       </div>
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import { mapGetters, mapActions } from 'vuex';
 
 export default {
@@ -42,7 +43,24 @@ export default {
     handleLogout() {
       this.logout();
       this.$router.push('/login');
-    }
+    },
+    async sendEmail() {
+      // Send email logic here
+      if(this.username == 'admin') {
+        console.log(this.username);
+        await axios.get('api/sendEmailCode')
+        .then(response => {
+          alert('Email sent successfully', response.data);
+        })
+        .catch(error => {
+          alert('Error sending email', error);
+        });
+      }
+      else{
+        // display pop up to the user that only admin can send email
+        alert('Only admin can send email');
+      }
+    },
   }
 };
 </script>
