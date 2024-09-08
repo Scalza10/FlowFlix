@@ -1,4 +1,5 @@
 import os
+import re
 from models import db, Code, User
 from flask import (
     Flask,
@@ -48,6 +49,11 @@ odbc_connect_str = (
 
 conn_params = urllib.parse.quote_plus(odbc_connect_str)
 
+def is_valid_email(email):
+    # Simple regex for email validation
+    regex = r'^\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+    return re.match(regex, email)
+
 app.config["SQLALCHEMY_DATABASE_URI"] = f"mssql+pyodbc:///?odbc_connect={conn_params}"
 db.init_app(app)
 
@@ -59,10 +65,15 @@ def msg():
 
 @app.route("/api/sendEmailCode", methods=["GET"])
 def sendCodeEmail():
+    email = request.args.get('email')
+    
+    if not email or not is_valid_email(email):
+        return jsonify({"message": "Invalid email address"}), 400
+
     data = {
         "personalizations": [
             {
-                "to": [{"email": f"{os.getenv('SENDGRID_TO_EMAIL')}"}],
+                "to": [{"email": email}],
             }
         ],
         "from": {"email": f"{os.getenv('SENDGRID_FROM_EMAIL')}"},
@@ -76,7 +87,7 @@ def sendCodeEmail():
         print(response.headers)
         return jsonify({"message": "Email sent successfully"}), 200
     except Exception as e:
-        print(e.message)
+        print(e)
         return jsonify({"message": "Error sending email"}), 400
 
 

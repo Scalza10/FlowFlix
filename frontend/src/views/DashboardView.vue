@@ -20,11 +20,24 @@
         </div>
         <div class="dashboard-section">
           <h2>Quick Actions</h2>
-          <button @click="sendEmail" class="action-button">Action 1</button>
+          <button class="action-button" @click="showModal = true">Action 1</button>
           <button class="action-button">Action 2</button>
         </div>
       </div>
       <button @click="handleLogout" class="logout-button">Logout</button>
+    </div>
+
+    <!-- Modal -->
+    <div v-if="showModal" class="modal-overlay">
+      <div class="modal">
+        <h2>Send Email</h2>
+        <p>Enter the email address you would like to send the mail to:</p>
+        <input type="email" v-model="email" placeholder="Email address" />
+        <div class="modal-actions">
+          <button @click="sendEmail" class="modal-button">Send</button>
+          <button @click="showModal = false" class="modal-button">Cancel</button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -35,6 +48,12 @@ import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'DashboardView',
+  data() {
+    return {
+      showModal: false,
+      email: ''
+    };
+  },
   computed: {
     ...mapGetters(['username'])
   },
@@ -45,22 +64,18 @@ export default {
       this.$router.push('/login');
     },
     async sendEmail() {
-      // Send email logic here
-      if(this.username == 'admin') {
-        console.log(this.username);
-        await axios.get('api/sendEmailCode')
-        .then(response => {
+      if (this.username === 'admin') {
+        try {
+          const response = await axios.get(`api/sendEmailCode?email=${this.email}`);
           alert('Email sent successfully', response.data);
-        })
-        .catch(error => {
+        } catch (error) {
           alert('Error sending email', error);
-        });
-      }
-      else{
-        // display pop up to the user that only admin can send email
+        }
+      } else {
         alert('Only admin can send email');
       }
-    },
+      this.showModal = false;
+    }
   }
 };
 </script>
@@ -144,5 +159,46 @@ h1 {
 
 .logout-button:hover {
   background-color: #d43f3f;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-button {
+  padding: 10px;
+  background-color: #42b983;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.modal-button:hover {
+  background-color: #369f6b;
 }
 </style>
