@@ -3,22 +3,22 @@
     <h1>Dashboard</h1>
     <p>Welcome, {{ username }}! Welcome to your dashboard!</p>
     <!-- Add more dashboard content here -->
-    <button @click="logout">Logout</button>
+    <button @click="handleLogout">Logout</button>
   </div>
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
+
 export default {
   name: 'DashboardView',
-  props: {
-    username: {
-      type: String,
-      required: true
-    }
+  computed: {
+    ...mapGetters(['username'])
   },
   methods: {
-    logout() {
-      localStorage.removeItem('access_token');
+    ...mapActions(['logout']),
+    handleLogout() {
+      this.logout();
       this.$router.push('/login');
     }
   }

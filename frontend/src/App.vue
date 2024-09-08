@@ -10,21 +10,15 @@
 </template>
 
 <script>
-import jwt_decode from 'jwt-decode';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'App',
-  data() {
-    return {
-      username: ''
-    };
+  computed: {
+    ...mapGetters(['username'])
   },
   created() {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      const decoded = jwt_decode(token);
-      this.username = decoded.username;
-    }
+    this.$store.dispatch('initialize');
   }
 };
 </script>
