@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a sample Flask application that integrates with an SQL database and includes data models. The app's main feature is generating access codes that users can redeem to access content for a limited time. The application is hosted on Azure Web App, includes a microservice for emailing codes, and has a Vue.js front end for an enhanced user experience.
+This is a sample Flask application that integrates with an SQL database and includes data models. The app's main feature is generating access codes that users can redeem to access content for a limited time. The application is hosted on Azure Web App, includes a microservice for emailing codes, and has a Vue.js front end for an enhanced user experience. Additionally, the application also implements the MVC (Model-View-Controller) as a way to organize and distribute the responsibilities inside the code.
 
 ## Features
 
@@ -13,6 +13,7 @@ This is a sample Flask application that integrates with an SQL database and incl
 - **Microservice for Emailing Codes**: A microservice sends codes to users via email.
 - **Vue.js Integration**: Vue.js is integrated to enhance the front-end experience.
 - **Cloud Hosting**: The app is deployed on Azure Web App.
+- **MVC Paradigm**: The application follows the MVC (Model-View-Controller) architectural pattern.
 
 ## Future Enhancements
 
@@ -36,15 +37,15 @@ This is a sample Flask application that integrates with an SQL database and incl
 ### Backend Setup
 
 1. **Clone the repository**:
-   sh
-   git clone https://github.com/your-repo/sample-flask-app.git
-   cd sample-flask-app
+    sh
+    git clone https://github.com/your-repo/sample-flask-app.git
+    cd sample-flask-app
 2. **Create virtual Env**:
-    python -m venv venv
-    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+     python -m venv venv
+     source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 
 3. **Install dependencies**:
-    pip install -r requirements.txt
+     pip install -r requirements.txt
 
 4. **Set up environment variables**: Create a .env file in the root directory and add the following:
 
@@ -61,13 +62,13 @@ SENDGRID_FROM_EMAIL= verified From email for sendgrid
 ### Frontend Setup
 
 1. **Navigate to the frontend directory:**
-    cd frontend
+     cd frontend
 
 2. **Install dependencies:**
-    npm install
+     npm install
 
 3. **Run the Vue.js development server:**
-    npm run serve
+     npm run serve
 
 ## Deployment
 
@@ -82,3 +83,4 @@ The application is deployed on Azure Web App. Follow the Azure documentation for
 ## License
 
 This project is licensed under the MIT License.
+
