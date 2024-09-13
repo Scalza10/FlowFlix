@@ -1,28 +1,20 @@
 import os
-import re
-from models import db, Code, User
+from models import db
 from flask import (
     Flask,
     render_template,
-    redirect,
-    url_for,
-    request,
-    flash,
-    session,
     send_from_directory,
-    jsonify,
 )
 from flask_jwt_extended import (
     JWTManager,
-    create_access_token,
-    jwt_required,
-    get_jwt_identity,
 )
-from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
 import urllib.parse
+
+# Import Blueprints
+from _blueprints.auth import auth_bp
+from _blueprints.email import email_bp
+from _blueprints.codes import codes_bp
 
 app = Flask(
     __name__, static_folder="./frontend/dist", template_folder="./frontend/dist"
@@ -48,106 +40,14 @@ odbc_connect_str = (
 )
 
 conn_params = urllib.parse.quote_plus(odbc_connect_str)
-
-def is_valid_email(email):
-    # Simple regex for email validation
-    regex = r'^\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-    return re.match(regex, email)
-
 app.config["SQLALCHEMY_DATABASE_URI"] = f"mssql+pyodbc:///?odbc_connect={conn_params}"
+
 db.init_app(app)
 
-
-@app.route("/api/msg", methods=["GET"])
-def msg():
-    return "Hello World!"
-
-
-@app.route("/api/sendEmailCode", methods=["GET"])
-def sendCodeEmail():
-    email = request.args.get('email')
-    
-    if not email or not is_valid_email(email):
-        return jsonify({"message": "Invalid email address"}), 400
-
-    data = {
-        "personalizations": [
-            {
-                "to": [{"email": email}],
-            }
-        ],
-        "from": {"email": f"{os.getenv('SENDGRID_FROM_EMAIL')}"},
-        "template_id": f"{os.getenv('SENDGRID_TEMPLATE_ID')}",
-    }
-    try:
-        sg = SendGridAPIClient(os.getenv("SENDGRID_API_KEY"))
-        response = sg.client.mail.send.post(request_body=data)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
-        return jsonify({"message": "Email sent successfully"}), 200
-    except Exception as e:
-        print(e)
-        return jsonify({"message": "Error sending email"}), 400
-
-
-@app.route("/api/register", methods=["POST"])
-def register():
-    username = request.json["username"]
-    email = request.json["email"]
-    password = request.json["password"]
-
-    # Check if user already exists
-    user = User.query.filter_by(Username=username).first()
-    if user:
-        return jsonify({"message": "User already exists!"}), 400
-
-    # Create new user
-    new_user = User(username, email, password)
-    db.session.add(new_user)
-    db.session.commit()
-
-    # Create JWT token
-    access_token = create_access_token(
-        identity={"username": new_user.Username, "email": new_user.Email}
-    )
-    return (
-        jsonify(
-            {
-                "message": "Registration successful! Redirecting shortly...",
-                "access_token": access_token,
-            }
-        ),
-        200,
-    )
-
-
-@app.route("/api/login", methods=["POST"])
-def login():
-    username = request.json["username"]
-    password = request.json["password"]
-
-    # Check if user exists
-    user = User.query.filter_by(Username=username).first()
-    if user is None:
-        return jsonify({"message": "User does not exist!"}), 400
-
-    # Check if password is correct
-    if not check_password_hash(user.PasswordHash, password):
-        return jsonify({"message": "Invalid password!"}), 400
-
-    # Create JWT token
-    access_token = create_access_token(
-        identity={"username": user.Username, "email": user.Email}
-    )
-    return jsonify({"message": "Login successful!", "access_token": access_token}), 200
-
-
-@app.route("/api/protected", methods=["GET"])
-@jwt_required()
-def protected():
-    current_user = get_jwt_identity()
-    return jsonify(logged_in_as=current_user), 200
+# Register Blueprints for routes
+app.register_blueprint(auth_bp, url_prefix="/api")
+app.register_blueprint(email_bp, url_prefix="/api")
+app.register_blueprint(codes_bp, url_prefix="/api")
 
 
 @app.route("/", defaults={"path": ""})
